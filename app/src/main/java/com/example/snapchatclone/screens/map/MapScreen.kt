@@ -1,4 +1,4 @@
-package com.example.snapchatclone.map
+package com.example.snapchatclone.screens.map
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
