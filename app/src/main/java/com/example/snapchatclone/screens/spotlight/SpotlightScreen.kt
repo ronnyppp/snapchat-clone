@@ -1,4 +1,4 @@
-package com.example.snapchatclone.spotlight
+package com.example.snapchatclone.screens.spotlight
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package com.example.snapchatclone.camera
+package com.example.snapchatclone.screens.camera
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

@@ -1,4 +1,4 @@
-package com.example.snapchatclone
+package com.example.snapchatclone.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

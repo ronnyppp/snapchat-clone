@@ -1,4 +1,4 @@
-package com.example.snapchatclone.messages
+package com.example.snapchatclone.screens.messages
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

@@ -14,11 +14,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.snapchatclone.camera.CameraScreen
-import com.example.snapchatclone.map.MapScreen
-import com.example.snapchatclone.messages.MessagesScreen
-import com.example.snapchatclone.stories.StoriesScreen
-import com.example.snapchatclone.spotlight.SpotlightScreen
+import com.example.snapchatclone.screens.camera.CameraScreen
+import com.example.snapchatclone.screens.map.MapScreen
+import com.example.snapchatclone.screens.messages.MessagesScreen
+import com.example.snapchatclone.screens.stories.StoriesScreen
+import com.example.snapchatclone.screens.spotlight.SpotlightScreen
 
 @PreviewScreenSizes
 @Composable
