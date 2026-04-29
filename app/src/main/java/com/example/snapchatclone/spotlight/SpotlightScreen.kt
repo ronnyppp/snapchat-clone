@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,10 +14,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TagFaces
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledIconButton
@@ -61,38 +65,32 @@ fun SpotlightScreen() {
                 Spacer(modifier = Modifier.width(40.dp * 2 + 16.dp))
             }
         )
-        // Bottom-Center Buttons
-        Box(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(32.dp)
+
+        // User/Post Info
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            )
-            {
-                // Gallery preview
-                IconButton(onClick = {/**/}) {
-                    Icon(Icons.Default.Image, contentDescription = "Gallery", tint = Color.White)
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                // Capture
-                OutlinedButton(onClick = {},
-                    border = BorderStroke(width = 4.dp, Color.White),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color.Transparent
-                    ),
-                    shape = CircleShape,
-                    modifier = Modifier.size(80.dp)) {
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                // Filters
-                IconButton(onClick = {/**/}) {
-                    Icon(Icons.Default.TagFaces, contentDescription = "Filters", tint = Color.White)
-                }
+            Text("@username", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("Caption goes here...", color = Color.White)
+        }
+        // Interaction Buttons
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomEnd).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            IconButton(onClick = {}) {
+                Icon(Icons.Default.Favorite, contentDescription = "Like", tint = Color.White)
+            }
+            IconButton(onClick = {}) {
+                Icon(Icons.Default.ChatBubble, contentDescription = "Comment", tint = Color.White)
+            }
+            IconButton(onClick = {}) {
+                Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White)
             }
         }
-
     }
 }
