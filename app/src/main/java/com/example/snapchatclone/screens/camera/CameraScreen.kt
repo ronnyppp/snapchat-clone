@@ -32,7 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.snapchatclone.TopBar
+import com.example.snapchatclone.components.TopBar
 
 @Composable
 fun CameraScreen() {
@@ -40,6 +40,7 @@ fun CameraScreen() {
     Box(
         modifier = Modifier.fillMaxSize().background(Color.Black),
     ) {
+        // Top Buttons
         TopBar(
             leftContent = {
                 FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
@@ -54,6 +55,7 @@ fun CameraScreen() {
                 }
             },
         )
+        // Right-side buttons
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)) {
             FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(

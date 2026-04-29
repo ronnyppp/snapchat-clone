@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.snapchatclone.TopBar
+import com.example.snapchatclone.components.TopBar
 
 @Composable
 fun MapScreen() {
@@ -57,7 +57,7 @@ fun MapScreen() {
                 Text("Snap Map", fontSize = 25.sp, fontWeight = FontWeight.Bold)
             },
             rightContent = {
-                Text("")
+                Spacer(modifier = Modifier.width(16.dp))
                 FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = Color.DarkGray, contentColor = Color.White
                 ), modifier = Modifier.size(40.dp)) {
