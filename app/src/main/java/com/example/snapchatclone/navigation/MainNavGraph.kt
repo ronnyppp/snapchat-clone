@@ -8,18 +8,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.snapchatclone.auth.AvatarViewModel
-import com.example.snapchatclone.features.LoginScreen
+import com.example.snapchatclone.features.camera.CameraPreviewViewModel
 import com.example.snapchatclone.features.camera.ui.CameraScreen
 import com.example.snapchatclone.features.login.ui.ProfileScreen
 import com.example.snapchatclone.features.map.ui.MapScreen
@@ -27,15 +30,21 @@ import com.example.snapchatclone.features.messages.ui.ChatScreen
 import com.example.snapchatclone.features.messages.ui.ChatsScreen
 import com.example.snapchatclone.features.stories.ui.StoriesScreen
 import com.example.snapchatclone.features.spotlight.ui.SpotlightScreen
-import com.example.snapchatclone.features.login.ui.ProfileSetupScreen
 import com.example.snapchatclone.features.stories.StoriesViewModel
+import com.example.snapchatclone.features.stories.ui.PreviewStoryScreen
+import com.example.snapchatclone.features.stories.ui.StoryViewerScreen
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun NavBar(
-    navController: NavHostController
+fun MainNavGraph(
+    avatarViewModel: AvatarViewModel = viewModel(),
+    cameraPreviewModel: CameraPreviewViewModel = viewModel(),
+    storiesViewModel: StoriesViewModel = viewModel(),
+    rootNavController: NavHostController
 ) {
-    // current route
+    // internal nav controller for app tabs
+    val navController = rememberNavController()
+    // track curr rout for navigation
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
     NavigationSuiteScaffold(
@@ -44,7 +53,7 @@ fun NavBar(
             navigationBarContentColor = Color.Gray
         ),
         navigationSuiteItems = {
-            // nav bar items
+            // nav bar destinations
             AppDestinations.entries.forEach { destination ->
                 item(
                     icon = {
@@ -53,10 +62,9 @@ fun NavBar(
                             contentDescription = destination.label
                         )
                     },
-                    // selected tab based on current route
                     selected = currentDestination == destination.route,
-                    // navigate when tab is clicked
                     onClick = {
+                        // avoid duplicate destinations in back stack
                         navController.navigate(destination.route) {
                             popUpTo(navController.graph.startDestinationId)
                             launchSingleTop = true
@@ -67,35 +75,27 @@ fun NavBar(
         }
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            val nestedNavController = rememberNavController()
-            val avatarViewModel: AvatarViewModel = viewModel()
-            val storiesViewModel: StoriesViewModel = viewModel()
-            // controls which screen is displayed
             NavHost(
-                navController = nestedNavController,
+                navController = navController,
                 startDestination = AppDestinations.CAMERA.route,
+                route = "main_graph",
                 modifier = Modifier.padding(innerPadding)
             ) {
-                // each route takes you to different screen
-                composable(AppDestinations.MAP.route) { MapScreen(
-                    navController = nestedNavController,
-                    avatarViewModel = avatarViewModel
-                ) }
-                composable(AppDestinations.MESSAGES.route) { ChatsScreen(
-                    navController = nestedNavController,
-                    avatarViewModel = avatarViewModel
-                ) }
+                composable(AppDestinations.MAP.route) { MapScreen(navController, avatarViewModel) }
+                composable(AppDestinations.MESSAGES.route) { ChatsScreen(navController, avatarViewModel) }
                 composable(AppDestinations.CAMERA.route) { CameraScreen(
-                    navController = nestedNavController,
-                    avatarViewModel = avatarViewModel
-                ) }
+                    navController, cameraPreviewModel, avatarViewModel) }
                 composable(AppDestinations.STORIES.route) {
-                    // Observe the stories state to pass to StoriesScreen
+                    // observe stories when going to stories screen
+                    LaunchedEffect(Unit) {
+                        storiesViewModel.observeStories()
+                    }
+                    // story state
                     val stories by storiesViewModel.storiesState.collectAsState()
 
                     StoriesScreen(
                         stories = stories,
-                        navController = nestedNavController,
+                        navController = navController,
                         avatarViewModel = avatarViewModel,
                         onStoryClick = { story ->
                             // Encode the image URL before navigating
@@ -104,47 +104,64 @@ fun NavBar(
                             navController.navigate("story_viewer?imageUrl=$encodedUrl")
                         }
                     )
-                 }
-                composable(AppDestinations.SPOTLIGHT.route) { SpotlightScreen(
-                    navController = nestedNavController,
-                    avatarViewModel = avatarViewModel
-                ) }
-                composable("login") {
-                    LoginScreen(
-                        navController = nestedNavController,
-                        onLoginSuccess = {
-                            // Send user to camera screen if login successful
-                            nestedNavController.navigate(AppDestinations.CAMERA.route) {
-                                popUpTo("login") { inclusive = true }
-                            }
-                        }
-                    )
                 }
+                composable(AppDestinations.SPOTLIGHT.route) { SpotlightScreen(navController, avatarViewModel) }
 
-                composable("profileSetup") {
-                    ProfileSetupScreen(navController = nestedNavController, avatarViewModel = avatarViewModel)
-                }
-                // chat screen
                 composable("chat/{chatId}") { backStackEntry ->
-                    // Extract chatId from backStackEntry to send user to correct chat
+                    // pass chat id to chat screen
                     val chatId = backStackEntry.arguments?.getString("chatId")!!
-                    ChatScreen(chatId, nestedNavController)
+                    ChatScreen(chatId, navController)
                 }
-                // profile screen
                 composable("profile/{userId}") { backStackEntry ->
-                    // Extract userId from backStackEntry to send user to correct profile
                     val userId = backStackEntry.arguments?.getString("userId")!!
-
-                    ProfileScreen(avatarViewModel, nestedNavController, userId, onLogout = {
-                        // Clear user avatar data from DataStore
+                    ProfileScreen(avatarViewModel, navController, userId, onLogout = {
+                        // clear all user settings from DataStore
                         avatarViewModel.clearAllData()
                         FirebaseAuth.getInstance().signOut()
-                        navController.navigate("login") {
+                        // return to auth graph/login
+                        rootNavController.navigate("login") {
                             popUpTo(0) // clears backstack
                         }
                     })
                 }
+                // story preview
+                composable("preview/{imageUri}") { backStackEntry ->
+                    val uri = backStackEntry.arguments?.getString("imageUri") ?: return@composable
+                    // pass image uri of image taken to preview story
+                    PreviewStoryScreen(
+                        imageUri = uri,
+                        onSend = {
+                            // upload story to firebase
+                            storiesViewModel.uploadStory(Uri.parse(uri)) {
+                                success ->
+                                // go back to camera screen if successful
+                                if(success) {
+                                    navController.popBackStack()
+                                }
+                            }
+                        },
+                        // pop back to camera screen if cancel
+                        onCancel = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                // story viewer
+                composable(
+                    route = "story_viewer?imageUrl={imageUrl}",
+                    arguments = listOf(navArgument("imageUrl") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    })
+                ) { backStackEntry ->
+                    // pass image url to story viewer screen
+                    val imageUrl = backStackEntry.arguments?.getString("imageUrl")
 
+                    StoryViewerScreen(
+                        imageUrl = imageUrl,
+                        onClose = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }

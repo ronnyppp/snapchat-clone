@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.ui.graphics.vector.ImageVector
 
+// enums for destinations of nav bar
 enum class AppDestinations(
     val route: String,
     val label: String,

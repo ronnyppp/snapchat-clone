@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Top bar with left, center and right content
 @Composable
 fun TopBar(
     leftContent: @Composable RowScope.() -> Unit = {},

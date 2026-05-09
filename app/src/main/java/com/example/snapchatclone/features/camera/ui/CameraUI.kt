@@ -1,7 +1,7 @@
-package com.example.snapchatclone.screens.camera
+package com.example.snapchatclone.features.camera.ui
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.TagFaces
@@ -28,28 +27,53 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.snapchatclone.auth.AvatarViewModel
 import com.example.snapchatclone.components.TopBar
+import com.example.snapchatclone.features.camera.CameraPreviewViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun CameraScreen() {
-    // Bottom-most layer
+fun CameraUI(
+    onFlipCamera: () -> Unit = {},
+    onFlashToggle: () -> Unit = {},
+    onCapture: () -> Unit = {},
+    navController: NavController,
+    avatarViewModel: AvatarViewModel,
+    viewModel: CameraPreviewViewModel
+) {
+    val avatarId by avatarViewModel.avatarState.collectAsState()
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+
     Box(
-        modifier = Modifier.fillMaxSize().background(Color.Black),
+        modifier = Modifier.fillMaxSize()
     ) {
         // Top Buttons
         TopBar(
             leftContent = {
-                FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = Color.DarkGray, contentColor = Color.White
+                FilledIconButton(onClick = {
+                    navController.navigate("profile/$userId")
+                }, colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = Color.DarkGray.copy(alpha = 0.5f), contentColor = Color.White
                 ), modifier = Modifier.size(40.dp)) {
-                    Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)
+                    Image(
+                        painter = painterResource(avatarId),
+                        contentDescription = "Profile",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
                 }
                 FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = Color.DarkGray, contentColor = Color.White
+                    containerColor = Color.DarkGray.copy(alpha = 0.5f), contentColor = Color.White
                 ), modifier = Modifier.size(40.dp)) {
                     Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
                 }
@@ -59,20 +83,20 @@ fun CameraScreen() {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)) {
             FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = Color.DarkGray, contentColor = Color.White
+                containerColor = Color.DarkGray.copy(alpha = 0.5f), contentColor = Color.White
             ), modifier = Modifier.size(40.dp)) {
                 Icon(Icons.Default.PersonAdd, contentDescription = "Add", tint = Color.White)
             }
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = Color.DarkGray, contentColor = Color.White
+            FilledIconButton(onClick = onFlipCamera, colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = Color.DarkGray.copy(alpha = 0.5f), contentColor = Color.White
             ), modifier = Modifier.size(40.dp)) {
                 Icon(Icons.Default.Cameraswitch, contentDescription = "Flip", tint = Color.White)
             }
-            FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = Color.DarkGray, contentColor = Color.White
+            FilledIconButton(onClick = onFlashToggle, colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = Color.DarkGray.copy(alpha = 0.5f), contentColor = Color.White
             ), modifier = Modifier.size(40.dp)) {
                 Icon(Icons.Default.FlashOn, contentDescription = "Flash", tint = Color.White)
             }
@@ -92,8 +116,7 @@ fun CameraScreen() {
                     Icon(Icons.Default.Image, contentDescription = "Gallery", tint = Color.White)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                // Capture
-                OutlinedButton(onClick = {},
+                OutlinedButton(onClick = onCapture,
                     border = BorderStroke(width = 4.dp, Color.White),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = Color.Transparent,
@@ -109,6 +132,5 @@ fun CameraScreen() {
                 }
             }
         }
-
     }
 }

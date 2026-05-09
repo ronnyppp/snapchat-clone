@@ -1,5 +1,6 @@
-package com.example.snapchatclone.screens.spotlight
+package com.example.snapchatclone.features.spotlight.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.FilledIconButton
@@ -21,26 +22,47 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.snapchatclone.auth.AvatarViewModel
 import com.example.snapchatclone.components.TopBar
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun SpotlightScreen() {
+fun SpotlightScreen(
+    navController: NavController,
+    avatarViewModel: AvatarViewModel
+) {
+    val avatarId by avatarViewModel.avatarState.collectAsState()
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+
     // Bottom-most layer
     Box(
         modifier = Modifier.fillMaxSize().background(Color.Gray),
     ) {
         TopBar(
             leftContent = {
-                FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
+                FilledIconButton(onClick = {
+                    navController.navigate("profile/$userId")
+                }, colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = Color.DarkGray, contentColor = Color.White
                 ), modifier = Modifier.size(40.dp)) {
-                    Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)
+                    Image(
+                        painter = painterResource(avatarId),
+                        contentDescription = "Profile",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
                 }
                 FilledIconButton(onClick = {/**/}, colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = Color.DarkGray, contentColor = Color.White
