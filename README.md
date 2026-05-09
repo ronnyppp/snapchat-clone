@@ -88,3 +88,5 @@ Run the app with emulator
 ## 📄 License
 
 This project is for educational and portfolio purposes.
+
+Avatars from [DiceBear](https://www.dicebear.com/playground/?style=avataaars)
